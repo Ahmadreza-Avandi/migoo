@@ -48,6 +48,38 @@
     .active-btn {
       background-color: #1e40af !important;
     }
+
+
+    .water-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      overflow: hidden;
+      border-radius: 15px;
+      background: #e0f7fa;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .water {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: #2196f3;
+      transition: height 0.5s ease-in-out;
+    }
+    .wave {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      top: -20%;
+      left: -50%;
+      background: url('https://cdn.pixabay.com/photo/2013/07/13/12/07/wave-159389_960_720.png');
+      background-size: cover;
+      animation: wave-animation 2s infinite linear;
+    }
+    @keyframes wave-animation {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen flex flex-col font-sans">
@@ -125,7 +157,18 @@
           </div>
         </div>
       </section>
-      
+      <br>
+      <!-- کارت بازماندگی میگو -->
+      <div class="text-center">
+        <div class="water-container mx-auto">
+          <div class="water" id="water-level" style="height: 70%;">
+            <div class="wave"></div>
+          </div>
+          <img src="https://cdn-icons-png.flaticon.com/512/7830/7830766.png" alt="میگو" class="absolute top-10 left-1/2 transform -translate-x-1/2 w-16">
+        </div>
+        <p class="mt-4 text-xl font-semibold">درصد بازماندگی: <span id="survival-rate">70%</span></p>
+      </div>
+
       <!-- کارت نمودار میانگین (با دکمه‌های فیلتر و نمایش جدول) -->
       <section class="card bg-white rounded-lg shadow-lg p-6 lg:col-span-3">
         <h2 class="text-blue-700 font-semibold text-xl mb-4">نمودار میانگین داده‌ها</h2>
@@ -277,6 +320,14 @@
       updateAverageTable("today");
       setupAggregationButtons();
     });
+
+    function updateWaterLevel(percent) {
+      document.getElementById('water-level').style.height = percent + '%';
+      document.getElementById('survival-rate').textContent = percent + '%';
+    }
+    
+    setTimeout(() => updateWaterLevel(70), 500); 
   </script>
 </body>
 </html>
+

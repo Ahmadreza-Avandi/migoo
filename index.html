@@ -48,8 +48,25 @@
     .active-btn {
       background-color: #1e40af !important;
     }
-
-
+    .camera-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      border: 2px solid #1e3a8a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .camera-container video {
+      width: 100%;
+      height: auto;
+    }
+    .camera-label {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 1.25rem;
+      color: #1e3a8a;
+    }
     .water-container {
       position: relative;
       width: 400px;
@@ -58,6 +75,7 @@
       border-radius: 15px;
       background: #e0f7fa;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      margin: auto;
     }
     .water {
       position: absolute;
@@ -84,17 +102,13 @@
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen flex flex-col font-sans">
   <!-- هدر -->
-  <body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen flex flex-col font-sans">
-    <!-- هدر -->
-    <header class="shadow sticky top-0 z-50 bg-black">
-      <div class="container mx-auto flex flex-col md:flex-row justify-between items-center py-4 px-6">
-        <div class="flex items-center space-x-3">
-          <div>
-            <span class="text-white text-2xl font-bold">پایش پرورش میگو</span>
-          </div>
-        </div>
+  <header class="shadow sticky top-0 z-50 bg-black">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center py-4 px-6">
+      <div class="flex items-center space-x-3">
+        <span class="text-white text-2xl font-bold">پایش پرورش میگو</span>
       </div>
-    </header>
+    </div>
+  </header>
   
   <!-- محتوای اصلی -->
   <main class="flex-grow container mx-auto py-10 px-4">
@@ -142,7 +156,7 @@
         <h2 class="text-blue-500 font-semibold text-xl mb-4">pH</h2>
         <div class="relative my-4">
           <div class="ph-scale">
-            <div class="ph-pointer" id="ph-pointer" style="left: 0%;"></div>
+            <div class="ph-pointer" id="ph-pointer" style="left: 50%;"></div>
           </div>
           <div class="flex justify-between text-gray-500 text-sm mt-1">
             <span>0</span>
@@ -157,17 +171,30 @@
           </div>
         </div>
       </section>
-      <br>
-      <!-- کارت بازماندگی میگو -->
-      <div class="text-center">
-        <div class="water-container mx-auto">
-          <div class="water" id="water-level" style="height: 70%;">
-            <div class="wave"></div>
-          </div>
-          <img src="https://cdn-icons-png.flaticon.com/512/7830/7830766.png" alt="میگو" class="absolute top-10 left-1/2 transform -translate-x-1/2 w-16">
-        </div>
-        <p class="mt-4 text-xl font-semibold">درصد بازماندگی: <span id="survival-rate">70%</span></p>
+       <!-- کارت بازماندگی میگو (استخر) -->
+  <!-- کارت بازماندگی میگو (استخر) -->
+<div class="mt-8">
+  <div class="card bg-white rounded-lg shadow-lg p-6 text-center">
+    <div class="water-container mx-auto relative">
+      <div class="water" id="water-level" style="height: 70%;">
+        <div class="wave"></div>
       </div>
+      <img src="https://cdn-icons-png.flaticon.com/512/7830/7830766.png" alt="میگو" class="absolute top-10 left-1/2 transform -translate-x-1/2 w-16">
+    </div>
+    <p class="mt-4 text-xl font-semibold">درصد بازماندگی: <span id="survival-rate">70%</span></p>
+  </div>
+</div>
+
+<!-- کارت دوربین زنده -->
+<div class="mt-8">
+  <section class="card bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-blue-700 font-semibold text-xl mb-4">دوربین زنده</h2>
+    <div class="camera-container">
+      <video id="live-camera" autoplay playsinline></video>
+    </div>
+    <p class="camera-label">دوربین زنده</p>
+  </section>
+</div>
 
       <!-- کارت نمودار میانگین (با دکمه‌های فیلتر و نمایش جدول) -->
       <section class="card bg-white rounded-lg shadow-lg p-6 lg:col-span-3">
@@ -188,13 +215,12 @@
   
   <!-- JavaScript -->
   <script>
-    /* داده‌های نمونه میانگین برای هر نوع فیلتر
-       زمان‌بندی نمونه‌گیری: هر 6 ساعت (24:00، 06:00، 12:00، 18:00) */
+    // داده‌های نمونه میانگین برای هر نوع فیلتر
     const averageData = {
       "today": {
         categories: ["24:00", "06:00", "12:00", "18:00"],
-        temperature: [28, 32, 38, 28],   // صبح: متوسط، ظهر: بالا، شب: پایین
-        oxygen: [12, 16, 16, 12],         // صبح و ظهر بالا، شب پایین
+        temperature: [28, 32, 38, 28],
+        oxygen: [12, 16, 16, 12],
         ph: [7.0, 7.0, 7.0, 7.0]
       },
       "daily": {
@@ -314,19 +340,36 @@
       });
     }
 
-    // راه‌اندازی اولیه: نمودار میانگین، جدول و تنظیم دکمه‌ها
-    window.addEventListener('load', () => {
-      initAverageChart("today");
-      updateAverageTable("today");
-      setupAggregationButtons();
-    });
+    // راه‌اندازی دوربین با پشتیبانی از لپتاپ و اندروید
+    async function startCamera() {
+      try {
+        const constraints = { video: { facingMode: "environment" } };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const videoElement = document.getElementById('live-camera');
+        if ('srcObject' in videoElement) {
+          videoElement.srcObject = stream;
+        } else {
+          videoElement.src = window.URL.createObjectURL(stream);
+        }
+      } catch (error) {
+        console.error('خطا در دسترسی به دوربین:', error);
+      }
+    }
 
+    // به‌روزرسانی سطح آب
     function updateWaterLevel(percent) {
       document.getElementById('water-level').style.height = percent + '%';
       document.getElementById('survival-rate').textContent = percent + '%';
     }
-    
-    setTimeout(() => updateWaterLevel(70), 500); 
+
+    // راه‌اندازی اولیه همه توابع بعد از بارگذاری صفحه
+    window.addEventListener('load', () => {
+      initAverageChart("today");
+      updateAverageTable("today");
+      setupAggregationButtons();
+      startCamera();
+      updateWaterLevel(70);
+    });
   </script>
 </body>
 </html>

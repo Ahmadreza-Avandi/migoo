@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="داشبورد حرفه‌ای پرورش پالای میگو">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <!-- TailwindCSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <!-- Chart.js (در صورت نیاز) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- ApexCharts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <title>داشبورد پرورش پالای میگو</title>
+  <style>
+    /* استایل‌های سفارشی برای انیمیشن، سایه و واکنش‌گرا */
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+    }
+    .ph-scale {
+      position: relative;
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, purple);
+      border-radius: 10px;
+    }
+    .ph-pointer {
+      position: absolute;
+      top: -10px;
+      height: 40px;
+      width: 2px;
+      background-color: black;
+      transition: left 0.3s ease;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+    .active-btn {
+      background-color: #1e40af !important;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen flex flex-col font-sans">
+  <!-- هدر -->
+  <body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen flex flex-col font-sans">
+    <!-- هدر -->
+    <header class="shadow sticky top-0 z-50 bg-black">
+      <div class="container mx-auto flex flex-col md:flex-row justify-between items-center py-4 px-6">
+        <div class="flex items-center space-x-3">
+          <div>
+            <span class="text-white text-2xl font-bold">پایش پرورش میگو</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  
+  <!-- محتوای اصلی -->
+  <main class="flex-grow container mx-auto py-10 px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- کارت دما (بازه: 25 تا 40) -->
+      <section class="card bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-blue-700 font-semibold text-xl mb-4">دما</h2>
+        <div class="relative flex items-center justify-center">
+          <div class="relative w-40 h-40">
+            <svg class="w-full h-full" aria-hidden="true">
+              <!-- دایره پس‌زمینه -->
+              <circle cx="50%" cy="50%" r="45%" stroke="#e2e8f0" stroke-width="10" fill="none"></circle>
+              <!-- دایره مقدار دما -->
+              <circle id="temperature-circle" cx="50%" cy="50%" r="45%" stroke="#3b82f6" stroke-width="10" fill="none"
+                stroke-dasharray="283" stroke-dashoffset="283" style="transition: stroke-dashoffset 0.5s;"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <h1 id="temperature-value" class="text-3xl font-bold text-blue-600">25°C</h1>
+              <p class="text-gray-500 text-sm">بازه: 25–40</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- کارت اکسیژن (بازه: 10 تا 17) -->
+      <section class="card bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-blue-700 font-semibold text-xl mb-4">اکسیژن</h2>
+        <div class="relative flex items-center justify-center">
+          <div class="relative w-40 h-40">
+            <svg class="w-full h-full" aria-hidden="true">
+              <circle cx="50%" cy="50%" r="45%" stroke="#e2e8f0" stroke-width="10" fill="none"></circle>
+              <circle id="oxygen-circle" cx="50%" cy="50%" r="45%" stroke="#10b981" stroke-width="10" fill="none"
+                stroke-dasharray="283" stroke-dashoffset="283" style="transition: stroke-dashoffset 0.5s;"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <h1 id="oxygen-value" class="text-3xl font-bold text-green-600">10 mg/L</h1>
+              <p class="text-gray-500 text-sm">بازه: 10–17</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- کارت pH -->
+      <section class="card bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-blue-500 font-semibold text-xl mb-4">pH</h2>
+        <div class="relative my-4">
+          <div class="ph-scale">
+            <div class="ph-pointer" id="ph-pointer" style="left: 0%;"></div>
+          </div>
+          <div class="flex justify-between text-gray-500 text-sm mt-1">
+            <span>0</span>
+            <span>7 (خنثی)</span>
+            <span>14</span>
+          </div>
+          <div class="text-gray-500 text-center mt-2" id="ph-value">
+            pH: 7.00
+          </div>
+          <div class="text-sm text-center mt-1">
+            <span>محدوده ایمن: 6–8</span> | <span class="text-red-500 font-bold">خطرناک: &lt;6 یا &gt;8</span>
+          </div>
+        </div>
+      </section>
+      
+      <!-- کارت نمودار میانگین (با دکمه‌های فیلتر و نمایش جدول) -->
+      <section class="card bg-white rounded-lg shadow-lg p-6 lg:col-span-3">
+        <h2 class="text-blue-700 font-semibold text-xl mb-4">نمودار میانگین داده‌ها</h2>
+        <div id="averageChart"></div>
+        <!-- دکمه‌های انتخاب فیلتر (امروز، روزانه، هفتگی، ماهانه) -->
+        <div class="mt-4 flex justify-center space-x-4 space-x-reverse">
+          <button class="agg-btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" data-agg="today">امروز</button>
+          <button class="agg-btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" data-agg="daily">روزانه</button>
+          <button class="agg-btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" data-agg="weekly">هفتگی</button>
+          <button class="agg-btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" data-agg="monthly">ماهانه</button>
+        </div>
+        <!-- نمایش جدول داده‌های پیش‌تعریف شده -->
+        <div id="averageTableContainer" class="mt-6 overflow-x-auto"></div>
+      </section>
+    </div>
+  </main>
+  
+  <!-- JavaScript -->
+  <script>
+    /* داده‌های نمونه میانگین برای هر نوع فیلتر
+       زمان‌بندی نمونه‌گیری: هر 6 ساعت (24:00، 06:00، 12:00، 18:00) */
+    const averageData = {
+      "today": {
+        categories: ["24:00", "06:00", "12:00", "18:00"],
+        temperature: [28, 32, 38, 28],   // صبح: متوسط، ظهر: بالا، شب: پایین
+        oxygen: [12, 16, 16, 12],         // صبح و ظهر بالا، شب پایین
+        ph: [7.0, 7.0, 7.0, 7.0]
+      },
+      "daily": {
+        categories: ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"],
+        temperature: [30, 33, 35, 32, 34, 36, 31],
+        oxygen: [15, 16, 16, 15, 17, 16, 15],
+        ph: [7.0, 7.1, 7.0, 7.0, 7.0, 7.0, 7.0]
+      },
+      "weekly": {
+        categories: ["هفته ۱", "هفته ۲", "هفته ۳", "هفته ۴"],
+        temperature: [32, 34, 33, 35],
+        oxygen: [16, 16, 15, 16],
+        ph: [7.0, 7.0, 7.1, 7.0]
+      },
+      "monthly": {
+        categories: ["ماه ۱", "ماه ۲", "ماه ۳", "ماه ۴", "ماه ۵", "ماه ۶"],
+        temperature: [33, 34, 35, 33, 32, 34],
+        oxygen: [16, 15, 16, 15, 16, 15],
+        ph: [7.0, 7.0, 7.1, 7.0, 7.0, 7.0]
+      }
+    };
+
+    let averageChart;
+
+    // راه‌اندازی اولیه نمودار میانگین با نوع پیش‌فرض "امروز"
+    function initAverageChart(aggType = "today") {
+      const data = averageData[aggType];
+      const options = {
+        chart: {
+          type: 'line',
+          height: 350,
+          animations: {
+            enabled: true,
+            easing: 'easeinout',
+            speed: 800
+          },
+          toolbar: { show: false }
+        },
+        series: [
+          { name: 'دما', data: data.temperature },
+          { name: 'اکسیژن', data: data.oxygen },
+          { name: 'pH', data: data.ph }
+        ],
+        xaxis: {
+          categories: data.categories,
+          labels: { style: { colors: '#1e3a8a' } }
+        },
+        stroke: { curve: 'smooth' },
+        colors: ['#3b82f6', '#10b981', '#f87171'],
+        title: {
+          text: 'میانگین دما، اکسیژن و pH',
+          align: 'center',
+          style: { color: '#1e3a8a', fontSize: '16px' }
+        }
+      };
+      averageChart = new ApexCharts(document.querySelector("#averageChart"), options);
+      averageChart.render();
+    }
+
+    // به‌روزرسانی نمودار میانگین بر اساس نوع انتخاب‌شده
+    function updateAverageChart(aggType) {
+      const data = averageData[aggType];
+      if (averageChart) {
+        averageChart.updateOptions({
+          series: [
+            { name: 'دما', data: data.temperature },
+            { name: 'اکسیژن', data: data.oxygen },
+            { name: 'pH', data: data.ph }
+          ],
+          xaxis: { categories: data.categories }
+        });
+      }
+    }
+
+    // ایجاد یا به‌روزرسانی جدول داده‌های میانگین
+    function updateAverageTable(aggType) {
+      const data = averageData[aggType];
+      let tableHTML = `
+        <table class="min-w-full text-center">
+          <thead>
+            <tr class="bg-blue-100">
+              <th class="px-4 py-2">زمان / دسته‌بندی</th>
+              <th class="px-4 py-2">دما (°C)</th>
+              <th class="px-4 py-2">اکسیژن (mg/L)</th>
+              <th class="px-4 py-2">pH</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      for (let i = 0; i < data.categories.length; i++) {
+        tableHTML += `
+            <tr>
+              <td class="border px-4 py-2">${data.categories[i]}</td>
+              <td class="border px-4 py-2">${data.temperature[i]}</td>
+              <td class="border px-4 py-2">${data.oxygen[i]}</td>
+              <td class="border px-4 py-2">${data.ph[i]}</td>
+            </tr>
+        `;
+      }
+      tableHTML += `
+          </tbody>
+        </table>
+      `;
+      document.getElementById('averageTableContainer').innerHTML = tableHTML;
+    }
+
+    // تنظیم رویداد کلیک دکمه‌های فیلتر نمودار میانگین و به‌روزرسانی جدول
+    function setupAggregationButtons() {
+      document.querySelectorAll('.agg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const agg = btn.getAttribute('data-agg');
+          updateAverageChart(agg);
+          updateAverageTable(agg);
+          document.querySelectorAll('.agg-btn').forEach(b => b.classList.remove('active-btn'));
+          btn.classList.add('active-btn');
+        });
+      });
+    }
+
+    // راه‌اندازی اولیه: نمودار میانگین، جدول و تنظیم دکمه‌ها
+    window.addEventListener('load', () => {
+      initAverageChart("today");
+      updateAverageTable("today");
+      setupAggregationButtons();
+    });
+  </script>
+</body>
+</html>
